@@ -3,7 +3,7 @@ package model
 import java.time.LocalDateTime
 
 case class User(
-                 userId: String,
+                 userId: Long,
                  name: String,
                  creationDate: LocalDateTime = LocalDateTime.now,
                  note: String
@@ -13,7 +13,7 @@ case class User(
 }
 
 case class Post(
-                 postId: String,
+                 postId: Long,
                  content: String,
                  creationDate: LocalDateTime = LocalDateTime.now,
                  author: User

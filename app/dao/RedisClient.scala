@@ -3,9 +3,10 @@ package dao
 import org.redisson.Redisson
 import org.redisson.config.{Config, SingleServerConfig}
 
-class RedisClient(private[this] val cfg: Config) extends Redisson(cfg) {
+//@Singleton
+class RedisClient(cfg: Config) extends Redisson(cfg) {
 
-  this () {
+  def this () {
     this (new Config())
     val config: SingleServerConfig = cfg.useSingleServer()
     config.setAddress(s"${RedisClient.HOST}:${RedisClient.PORT}")

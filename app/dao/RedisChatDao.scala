@@ -11,9 +11,10 @@ import org.redisson.client.RedisException
 
 import scala.collection.SortedSet
 
+//@Singleton
 class RedisChatDao @Inject()(redisClient: RedisClient) extends ChatDao {
 
-  def userMap: RMap[String, User] = redisClient.getMap[String, User](RedisChatDao.USERS_KEY)
+  def userMap: RMap[Long, User] = redisClient.getMap[Long, User](RedisChatDao.USERS_KEY)
 
   def postsSet: RScoredSortedSet[Post] = redisClient.getScoredSortedSet[Post](RedisChatDao.USERS_KEY)
 

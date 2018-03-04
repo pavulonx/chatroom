@@ -5,6 +5,7 @@ import model.{Post, User}
 import scala.collection.SortedSet
 
 trait ChatDao {
+
   def save(user: User): User
 
   def findUser(username: String): Option[User]
