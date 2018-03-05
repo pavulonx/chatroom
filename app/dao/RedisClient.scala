@@ -2,8 +2,9 @@ package dao
 
 import org.redisson.Redisson
 import org.redisson.config.{Config, SingleServerConfig}
+import javax.inject.Singleton
 
-//@Singleton
+@Singleton
 class RedisClient(cfg: Config) extends Redisson(cfg) {
 
   def this () {

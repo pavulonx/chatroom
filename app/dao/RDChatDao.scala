@@ -3,14 +3,15 @@ package dao
 import java.sql.Timestamp
 import java.time.{LocalDateTime, ZoneId}
 import javax.inject.{Inject, Singleton}
-import concurrent.duration._
+import utils.conversions._
 
 import database.DB
 import model.{Post, User}
 
 import scala.collection.SortedSet
+import scala.concurrent.{Await, Future}
 
-//@Singleton
+@Singleton
 class RDChatDao @Inject()(db: DB) extends ChatDao {
 
   import generated.Tables._
@@ -20,59 +21,48 @@ class RDChatDao @Inject()(db: DB) extends ChatDao {
 
   implicit def fromTimestamp(timestamp: Timestamp): LocalDateTime = timestamp.toLocalDateTime
 
-  override def save(user: User): User = {
+  override def save(user: User): Future[User] = {
     db.q(
       _.insertInto(USERS, USERS.NAME, USERS.NOTE, USERS.CREATION_DATE)
         .values(user.name, user.note, user.creationDate)
         .execute()
+    ).map(_ => user)
+  }
+
+  override def findUser(userId: Long): Future[Option[User]] = {
+    db.q(
+      _.selectFrom(USERS).where(USERS.USER_ID eq userId)
+        .fetchOptionalInto(classOf[User]).asScala()
     )
-    user
   }
 
-  override def findUser(username: String): Option[User] = {
-    val eventualUsers =
-      db.q(
-        _.selectFrom(USERS).where(USERS.NAME.eq(username))
-          .fetchOneInto(classOf[User])
-      )
-    eventualUsers.result(1.second)
-    eventualUsers.value.map(_.getOrElse(null))
-    //TODO: shitty code - refactor to futures
-  }
-
-  override def updateUser(user: User): User = {
+  override def updateUser(user: User): Future[User] = {
     db.q(
       _.update(USERS)
         .set(USERS.NAME, user.name)
         .set(USERS.NOTE, user.note)
         .where(USERS.USER_ID eq user.userId)
         .execute()
-    )
-    user
+    ).map(_ => user) //TODO: return real user
   }
 
-  override def deleteUser(username: String): User = {
-    val maybeUser = findUser(username)
+  override def deleteUser(userId: Long): Future[Option[User]] = {
+    val maybeUser = findUser(uId)
     db.q(
       _.deleteFrom(USERS)
         .where(USERS.NAME eq username)
         .execute()
-    )
-    maybeUser.get
+    ).flatMap(_ => maybeUser)
   }
 
-  override def save(post: Post): Post = {
+  override def save(post: Post): Future[Post] = {
     db.q(
-      //      _.selectFrom(POSTS)
-      //        .
       _.insertInto(POSTS)
         .values(post.author, post.content, post.creationDate)
         .execute()
-    )
-    post
+    ).map(_ => post)
   }
 
-  override def findPosts(count: Int): SortedSet[Post] = {
+  override def findPosts(count: Int): SortedSet[Post] = ???
 
-  }
 }

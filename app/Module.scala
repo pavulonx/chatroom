@@ -1,6 +1,7 @@
 import com.google.inject.AbstractModule
 import java.time.Clock
 
+import dao.{ChatDao, RDChatDao}
 import services.{ApplicationTimer, AtomicCounter, Counter}
 
 /**
@@ -23,6 +24,9 @@ class Module extends AbstractModule {
     bind(classOf[ApplicationTimer]).asEagerSingleton()
     // Set AtomicCounter as the implementation for Counter.
     bind(classOf[Counter]).to(classOf[AtomicCounter])
+
+    if (play)
+    bind(classOf[ChatDao]).to(classOf[RDChatDao])
   }
 
 }

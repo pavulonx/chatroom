@@ -3,20 +3,21 @@ package dao
 import model.{Post, User}
 
 import scala.collection.SortedSet
+import scala.concurrent.Future
 
 trait ChatDao {
 
-  def save(user: User): User
+  def save(user: User): Future[User]
 
-  def findUser(username: String): Option[User]
+  def findUser(userId: Long): Future[Option[User]]
 
-  def updateUser(user: User): User
+  def updateUser(user: User): Future[User]
 
-  def deleteUser(username: String): User
+  def deleteUser(userId: Long): Future[Option[User]]
 
-  def save(post: Post): Post
+  def save(post: Post): Future[Post]
 
-  def findPosts(count: Int = 10): SortedSet[Post]
+  def findPosts(count: Int = 10): Future[SortedSet[Post]]
 
   //  def deletePost(postId: String)
 
