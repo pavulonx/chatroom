@@ -1,7 +1,5 @@
 package dao
 
-import java.util
-
 import collection.JavaConverters._
 import javax.inject.{Inject, Singleton}
 
@@ -22,7 +20,7 @@ class RedisChatDao @Inject()(redisClient: RedisClient) extends ChatDao {
 
   def lastIndexOfPost: RAtomicLong = redisClient.getAtomicLong(RedisChatDao.POSTS_INDEX_KEY)
 
-  override def save(user: User): Future[User] = userMap.put(user.userId, user)
+  override def save(user: User): Future[User] = userMap.putAsync(user.userId, user).toScala
 
   override def findUser(userId: Long): Future[Option[User]] = userMap.getAsync(userId).toScala.map(Option(_))
 
@@ -30,16 +28,16 @@ class RedisChatDao @Inject()(redisClient: RedisClient) extends ChatDao {
 
   override def deleteUser(userId: Long): Future[Option[User]] = userMap.removeAsync(userId).toScala.map(Option(_))
 
-
   override def save(post: Post): Future[Post] = {
     val newIndex = lastIndexOfPost.incrementAndGet()
-    postsSet.add(newIndex, post)
-    post
+    postsSet.addAsync(newIndex, post).toScala
+      .map(_ => post)
   }
 
   override def findPosts(count: Int): Future[SortedSet[Post]] = {
-    val posts: util.Collection[Post] = postsSet.valueRange(-count, -1)
-    posts.asScala.to[SortedSet]
+    postsSet.valueRangeAsync(-count, -1).toScala.map(
+      _.asScala.to[SortedSet]
+    )
   }
 
   def failure: Nothing = throw new RedisException
