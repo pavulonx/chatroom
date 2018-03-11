@@ -3,16 +3,19 @@ package dao
 import collection.JavaConverters._
 import javax.inject.{Inject, Singleton}
 
+import akka.actor.ActorSystem
 import model.{Post, User}
 import org.redisson.api.{RAtomicLong, RMap, RScoredSortedSet}
 import org.redisson.client.RedisException
-import scala.compat.java8.FutureConverters._
 
+import scala.compat.java8.FutureConverters._
 import scala.collection.SortedSet
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RedisChatDao @Inject()(redisClient: RedisClient) extends ChatDao {
+class RedisChatDao @Inject()(redisClient: RedisClient, actorSystem: ActorSystem) extends ChatDao {
+
+  implicit val ec: ExecutionContext = actorSystem.dispatchers.lookup("contexts.mapping")
 
   def userMap: RMap[Long, User] = redisClient.getMap[Long, User](RedisChatDao.USERS_KEY)
 

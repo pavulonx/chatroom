@@ -18,14 +18,12 @@ unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/te
 libraryDependencies += "org.redisson" % "redisson" % "3.6.0"
 
 // https://mvnrepository.com/artifact/postgresql/postgresql
-libraryDependencies += "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
+//libraryDependencies += "postgresql" % "postgresql" % "9.3-1100-jdbc41"
 
 // https://mvnrepository.com/artifact/org.jooq/jooq
 libraryDependencies ++= Seq(
   // https://mvnrepository.com/artifact/org.postgresql/postgresql
   "org.postgresql" % "postgresql" % "42.2.1",
-
-//"org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "org.jooq" % "jooq" % "3.10.5",
   "org.jooq" % "jooq-codegen-maven" % "3.10.5",
   "org.jooq" % "jooq-meta" % "3.10.5"

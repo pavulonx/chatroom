@@ -3,19 +3,21 @@ package dao
 import java.sql.Timestamp
 import java.time.{LocalDateTime, ZoneId}
 import javax.inject.{Inject, Singleton}
-import utils.conversions._
 
+import akka.actor.ActorSystem
+import utils.conversions._
 import database.DB
 import model.{Post, User}
 
 import scala.collection.SortedSet
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RDChatDao @Inject()(db: DB) extends ChatDao {
+class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao {
+
+  implicit val ec: ExecutionContext = actorSystem.dispatchers.lookup("contexts.mapping")
 
   import generated.Tables._
-  import org.jooq.impl.DSL
 
   implicit def toTimestamp(dateTime: LocalDateTime): Timestamp = Timestamp.valueOf(dateTime)
 
@@ -47,10 +49,10 @@ class RDChatDao @Inject()(db: DB) extends ChatDao {
   }
 
   override def deleteUser(userId: Long): Future[Option[User]] = {
-    val maybeUser = findUser(uId)
+    val maybeUser = findUser(userId)
     db.q(
       _.deleteFrom(USERS)
-        .where(USERS.NAME eq username)
+        .where(USERS.USER_ID eq userId)
         .execute()
     ).flatMap(_ => maybeUser)
   }
@@ -63,6 +65,6 @@ class RDChatDao @Inject()(db: DB) extends ChatDao {
     ).map(_ => post)
   }
 
-  override def findPosts(count: Int): SortedSet[Post] = ???
+  override def findPosts(count: Int): Future[SortedSet[Post]] = ???
 
 }
