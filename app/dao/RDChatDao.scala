@@ -9,6 +9,8 @@ import utils.conversions._
 import database.DB
 import model.{Post, User}
 
+import collection.JavaConverters._
+
 import scala.collection.SortedSet
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,6 +40,14 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
     )
   }
 
+  override def findAllUsers(): Future[Set[User]] = {
+    db.q(
+      _.selectFrom(USERS)
+        .fetchInto(classOf[User])
+        .asScala.to[Set]
+    )
+  }
+
   override def updateUser(user: User): Future[User] = {
     db.q(
       _.update(USERS)
@@ -59,8 +69,8 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
 
   override def save(post: Post): Future[Post] = {
     db.q(
-      _.insertInto(POSTS)
-        .values(post.author, post.content, post.creationDate)
+      _.insertInto(POSTS, POSTS.AUTHOR, POSTS.CONTENT, POSTS.CREATION_DATE)
+        .values(post.author.userId, post.content, post.creationDate)
         .execute()
     ).map(_ => post)
   }

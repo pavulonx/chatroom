@@ -27,6 +27,8 @@ class RedisChatDao @Inject()(redisClient: RedisClient, actorSystem: ActorSystem)
 
   override def findUser(userId: Long): Future[Option[User]] = userMap.getAsync(userId).toScala.map(Option(_))
 
+  override def findAllUsers(): Future[Set[User]] = userMap.readAllMapAsync().toScala.map(_.values.asScala.to[Set])
+
   override def updateUser(user: User): Future[User] = userMap.putAsync(user.userId, user).toScala
 
   override def deleteUser(userId: Long): Future[Option[User]] = userMap.removeAsync(userId).toScala.map(Option(_))

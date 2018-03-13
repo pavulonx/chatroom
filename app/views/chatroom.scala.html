@@ -1,0 +1,60 @@
+@*
+* This template takes a single argument, a String containing a
+* message to display.
+*@
+@import model.User
+@(message: String, users: Set[User])
+@*
+* Call the `main` template with two arguments. The first
+* argument is a `String` with the title of the page, the second
+* argument is an `Html` object containing the body of the page.
+*@
+@main("Welcome to Play") {
+    @*
+    * Get an `Html` object by calling the built-in Play welcome
+    * template and passing a `String` message.
+    *@
+    <h1>
+    @message
+
+    </h1>
+
+
+    <form >
+        <label>
+            First name:
+            <input id="msg" type="text" name="msg">
+        </label><br>
+        <label>
+            Last name:
+            <input id="user" type="text" name="user">
+        </label><br>
+        <input id="submit" type="submit" value="Submit">
+    </form>
+
+
+    <h2>
+    @for(u <- users) {
+        @u.toString
+    }
+    </h2>
+}
+
+<script>
+        var msg = $("#msg").val();
+        var username = $("#user").val();
+        $("#submit").on("click", function () {
+            $.ajax({
+                type: "POST",
+                url: "localhost:9000/tell",
+                data: {
+                    "message": "msg"
+                },
+                headers: {
+                    "username": "username"
+                },
+                dataType: "application/json"
+            })
+        });
+
+</script>

@@ -6,7 +6,7 @@ case class User(
                  userId: Long,
                  name: String,
                  creationDate: LocalDateTime = LocalDateTime.now,
-                 note: String
+                 note: String = ""
                ) extends Ordered[User] {
 
   override def compare(that: User): Int = this.creationDate.compareTo(that.creationDate)
