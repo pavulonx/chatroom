@@ -1,9 +1,8 @@
 package database
 
-import javax.inject.Singleton
+import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import com.google.inject.Inject
 import org.jooq.{DSLContext, SQLDialect}
 import org.jooq.impl.DSL
 import play.api.db.Database
