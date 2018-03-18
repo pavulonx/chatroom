@@ -4,16 +4,23 @@ import javax.inject.Inject
 
 import akka.actor.Actor
 import dao.ChatDao
-import model.User
+import model.{Post, User}
+import actors.messages._
+import play.api.Logger
 
 class DatabaseActor @Inject()(val chatDao: ChatDao) extends Actor {
 
-  override def receive: Receive = {
-//    case
-    case _ =>
-  }
-}
+  lazy val logger: Logger = Logger(getClass)
 
-object Messages {
-//  class Persist(User)
+  override def receive: Receive = {
+    case NewMessage(username, msg) =>
+      val user = User(1L, username)
+      chatDao.save(user).flatMap(
+        _ => chatDao.save(Post(1L, msg, author = user))
+      )
+    case RegisterUser(username) =>
+      val user = User(1L, username)
+      chatDao.save(user)
+    case _ => logger.warn("Cannot handle message")
+  }
 }

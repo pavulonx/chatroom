@@ -75,6 +75,15 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
     ).map(_ => post)
   }
 
-  override def findPosts(count: Int): Future[SortedSet[Post]] = ???
+  override def findPosts(count: Int): Future[SortedSet[Post]] = {
+    db.q(
+      _.select(POSTS.AUTHOR, POSTS.CONTENT, POSTS.CREATION_DATE)
+        .from(POSTS)
+        .orderBy(POSTS.CREATION_DATE desc)
+        .limit(count)
+        .fetchInto(classOf[Post])
+        .asScala.to[SortedSet[Post]]
+    )
+  }
 
 }
