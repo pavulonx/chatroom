@@ -27,8 +27,8 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
 
   override def save(user: User): Future[User] = {
     db.q(
-      _.insertInto(USERS, USERS.NAME, USERS.NOTE, USERS.CREATION_DATE)
-        .values(user.name, user.note, user.creationDate)
+      _.insertInto(USERS, USERS.USER_ID, USERS.NAME, USERS.NOTE, USERS.MODIFICATION_DATE)
+        .values(user.userId, user.name, user.note, user.modificationDate)
         .execute()
     ).map(_ => user)
   }
@@ -36,6 +36,13 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
   override def findUser(userId: Long): Future[Option[User]] = {
     db.q(
       _.selectFrom(USERS).where(USERS.USER_ID eq userId)
+        .fetchOptionalInto(classOf[User]).asScala()
+    )
+  }
+
+  override def findUser(username: String): Future[Option[User]] = {
+    db.q(
+      _.selectFrom(USERS).where(USERS.NAME eq username)
         .fetchOptionalInto(classOf[User]).asScala()
     )
   }
@@ -69,20 +76,29 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
 
   override def save(post: Post): Future[Post] = {
     db.q(
-      _.insertInto(POSTS, POSTS.AUTHOR, POSTS.CONTENT, POSTS.CREATION_DATE)
-        .values(post.author.userId, post.content, post.creationDate)
+      _.insertInto(POSTS, POSTS.AUTHOR, POSTS.CONTENT, POSTS.MODIFICATION_DATE)
+        .values(post.author.userId, post.content, post.modificationDate)
         .execute()
     ).map(_ => post)
   }
 
   override def findPosts(count: Int): Future[SortedSet[Post]] = {
     db.q(
-      _.select(POSTS.AUTHOR, POSTS.CONTENT, POSTS.CREATION_DATE)
-        .from(POSTS)
-        .orderBy(POSTS.CREATION_DATE desc)
+      _.select(
+        POSTS.POST_ID,
+        POSTS.CONTENT,
+        POSTS.MODIFICATION_DATE,
+        USERS.USER_ID,
+        USERS.NAME,
+        USERS.MODIFICATION_DATE,
+        USERS.NOTE)
+        .from(POSTS.join(USERS).on(POSTS.AUTHOR.eq(USERS.USER_ID)))
+        .orderBy(POSTS.MODIFICATION_DATE desc)
         .limit(count)
-        .fetchInto(classOf[Post])
-        .asScala.to[SortedSet[Post]]
+        .fetchArray()
+        .map(r => Post(r.component1().longValue(), r.component2(), r.component3(),
+          User(r.component4(), r.component5(), r.component6(), r.component7())))
+        .to[SortedSet]
     )
   }
 

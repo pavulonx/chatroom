@@ -11,6 +11,8 @@ trait ChatDao {
 
   def findUser(userId: Long): Future[Option[User]]
 
+  def findUser(username: String): Future[Option[User]]
+
   def findAllUsers(): Future[Set[User]]
 
   def updateUser(user: User): Future[User]

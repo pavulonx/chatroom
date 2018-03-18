@@ -3,9 +3,10 @@ package controllers
 import javax.inject.{Inject, Singleton}
 
 import dao.ChatDao
-import model.{Post, User}
-import play.api.libs.json.JsValue
-import play.api.mvc.{AbstractController, Action, ControllerComponents, Request}
+import model.Post
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc._
+import json.PostJson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -14,26 +15,27 @@ class ChatController @Inject()(cc: ControllerComponents,
                                dao: ChatDao,
                                implicit val ec: ExecutionContext) extends AbstractController(cc) {
 
-  def index = Action.async(
+  def index: Action[AnyContent] = Action.async(
     dao.findAllUsers().map(o => Ok(views.html.chatroom("Chatroom", o)))
   )
 
   def tell: Action[JsValue] = Action.async(parse.json) {
     request: Request[JsValue] => {
-      val username = request.headers.get(ChatController.USERNAME).get
-      val msg = (request.body \ "message").as[String]
-      tellMsg(username, msg).map(m => Ok(m.toString))
+      val post: Post = Json.fromJson[Post](request.body).get
+      tellMsg(post).map(p => Ok(Json.toJson(p)))
     }
   }
 
-  private def tellMsg(username: String, msg: String): Future[Post] = {
-    val user = User(1L, username)
-    dao.save(user).flatMap(
-      _ => dao.save(Post(1l, msg, author = user))
-    )
+  private def tellMsg(post: Post): Future[Post] = {
+    dao.save(post)
+  }
+
+  def recent(count: Int): Action[AnyContent] = Action.async {
+    dao.findPosts(count).map(rp => Ok(Json.toJson(rp)))
   }
 }
 
 object ChatController {
-  val USERNAME = "username"
+  val USERNAME = "name"
+
 }

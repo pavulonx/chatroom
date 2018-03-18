@@ -23,9 +23,11 @@ class RedisChatDao @Inject()(redisClient: RedisClient, actorSystem: ActorSystem)
 
   def lastIndexOfPost: RAtomicLong = redisClient.getAtomicLong(RedisChatDao.POSTS_INDEX_KEY)
 
-  override def save(user: User): Future[User] = userMap.putAsync(user.userId, user).toScala
+  override def save(user: User): Future[User] = userMap.putAsync(user.userId, user).toScala.map(_ => user)
 
   override def findUser(userId: Long): Future[Option[User]] = userMap.getAsync(userId).toScala.map(Option(_))
+
+  override def findUser(username: String): Future[Option[User]] = userMap.readAllValuesAsync().toScala.map(c => c.asScala.find(_.name == username))
 
   override def findAllUsers(): Future[Set[User]] = userMap.readAllMapAsync().toScala.map(_.values.asScala.to[Set])
 
