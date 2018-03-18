@@ -19,7 +19,7 @@ class RedisChatDao @Inject()(redisClient: RedisClient, actorSystem: ActorSystem)
 
   def userMap: RMap[Long, User] = redisClient.getMap[Long, User](RedisChatDao.USERS_KEY)
 
-  def postsSet: RScoredSortedSet[Post] = redisClient.getScoredSortedSet[Post](RedisChatDao.USERS_KEY)
+  def postsSet: RScoredSortedSet[Post] = redisClient.getScoredSortedSet[Post](RedisChatDao.POSTS_KEY)
 
   def lastIndexOfPost: RAtomicLong = redisClient.getAtomicLong(RedisChatDao.POSTS_INDEX_KEY)
 

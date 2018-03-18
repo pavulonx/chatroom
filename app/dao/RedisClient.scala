@@ -4,7 +4,9 @@ import org.redisson.Redisson
 import org.redisson.config.{Config, SingleServerConfig}
 import javax.inject.{Inject, Singleton}
 
-import org.redisson.codec.SerializationCodec
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import org.redisson.codec.{JsonJacksonCodec, SerializationCodec}
 
 
 @Singleton
@@ -18,5 +20,8 @@ class RedisConnection {
   val cfg = new Config()
   private val ssConfig: SingleServerConfig = cfg.useSingleServer()
   ssConfig.setAddress(s"redis://$HOST:$PORT")
-  cfg.setCodec(new SerializationCodec)
+  val mapper = new ObjectMapper()
+  mapper.registerModule(DefaultScalaModule)
+  cfg.setCodec(new JsonJacksonCodec(mapper))
+  //  cfg.setCodec(Serialization)
 }

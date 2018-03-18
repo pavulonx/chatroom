@@ -17,6 +17,12 @@ unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/te
 // https://mvnrepository.com/artifact/org.redisson/redisson
 libraryDependencies += "org.redisson" % "redisson" % "3.6.0"
 
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.4"
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-scala
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.4"
+
+
 // https://mvnrepository.com/artifact/postgresql/postgresql
 //libraryDependencies += "postgresql" % "postgresql" % "9.3-1100-jdbc41"
 
