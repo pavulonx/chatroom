@@ -6,7 +6,7 @@ import dao.ChatDao
 import json.UserJson._
 import model.User
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AbstractController, Action, ControllerComponents, Request}
+import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,13 +29,10 @@ class UserController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def delete: Action[JsValue] = Action.async(parse.json) {
-    request: Request[JsValue] => {
-      val user: User = Json.fromJson[User](request.body).get
-      delete(user.userId).map {
-        case Some(u) => Ok(Json.toJson(u))
-        case None => NotFound("Cannot find user")
-      }
+  def delete(id: Long): Action[AnyContent] = Action.async {
+    dao.deleteUser(id).map {
+      case Some(u) => Ok(Json.toJson(u))
+      case None => NotFound("Cannot find user")
     }
   }
 
@@ -52,7 +49,4 @@ class UserController @Inject()(cc: ControllerComponents,
     dao.updateUser(user)
   }
 
-  def delete(userId: Long): Future[Option[User]] = {
-    dao.deleteUser(userId)
-  }
 }

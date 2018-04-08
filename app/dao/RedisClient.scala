@@ -23,5 +23,4 @@ class RedisConnection {
   val mapper = new ObjectMapper()
   mapper.registerModule(DefaultScalaModule)
   cfg.setCodec(new JsonJacksonCodec(mapper))
-  //  cfg.setCodec(Serialization)
 }

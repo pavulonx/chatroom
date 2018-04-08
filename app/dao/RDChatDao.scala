@@ -67,11 +67,16 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
 
   override def deleteUser(userId: Long): Future[Option[User]] = {
     val maybeUser = findUser(userId)
-    db.q(
-      _.deleteFrom(USERS)
-        .where(USERS.USER_ID eq userId)
+    db.withTransaction(
+      _.deleteFrom(POSTS).where(POSTS.AUTHOR eq userId)
         .execute()
-    ).flatMap(_ => maybeUser)
+    ) flatMap (
+      _ => db.q(
+        _.deleteFrom(USERS)
+          .where(USERS.USER_ID eq userId)
+          .execute()
+      ).flatMap(_ => maybeUser)
+      )
   }
 
   override def save(post: Post): Future[Post] = {
@@ -96,8 +101,8 @@ class RDChatDao @Inject()(db: DB, val actorSystem: ActorSystem) extends ChatDao 
         .orderBy(POSTS.MODIFICATION_DATE desc)
         .limit(count)
         .fetchArray()
-        .map(r => Post(r.component1().longValue(), r.component2(), r.component3(),
-          User(r.component4(), r.component5(), r.component6(), r.component7())))
+        .map(r => Post(r.component1.longValue, r.component2, r.component3,
+          User(r.component4, r.component5, r.component6, r.component7)))
         .to[SortedSet]
     )
   }

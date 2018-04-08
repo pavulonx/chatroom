@@ -4,7 +4,7 @@ import java.util.Optional
 
 object conversions {
 
-  implicit final class WrapOptional[T](val optional: Optional[T]) {
+  implicit final class RichOptional[T](val optional: Optional[T]) {
 
     def asScala(): Option[T] = optional match {
       case null => null
@@ -12,7 +12,7 @@ object conversions {
     }
   }
 
-  implicit final class WrapOption[T](val optional: Option[T]) {
+  implicit final class RichOption[T](val optional: Option[T]) {
 
     def asJava(): Optional[T] = optional match {
       case null => null

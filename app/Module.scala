@@ -26,10 +26,10 @@ class Module extends AbstractModule {
     // Set AtomicCounter as the implementation for Counter.
     bind(classOf[Counter]).to(classOf[AtomicCounter])
 
-    //    bind(classOf[ChatDao]).to(classOf[RDChatDao])
 //    bind(classOf[Config]).toInstance(new Config())
-    bind(classOf[RedisConnection]).asEagerSingleton()
-    bind(classOf[ChatDao]).to(classOf[RedisChatDao])
+//    bind(classOf[RedisConnection]).asEagerSingleton()
+//    bind(classOf[ChatDao]).to(classOf[RedisChatDao])
+        bind(classOf[ChatDao]).to(classOf[RDChatDao])
   }
 
 }

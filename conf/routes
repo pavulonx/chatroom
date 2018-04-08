@@ -19,4 +19,8 @@ GET           /recent/:count         controllers.ChatController.recent(count: In
 # user stuff
 POST          /users/register        controllers.UserController.register
 PUT           /users                 controllers.UserController.update
-DELETE        /users                 controllers.UserController.delete
+# DELETE        /users                 controllers.UserController.delete
+DELETE        /users/:id             controllers.UserController.delete(id: Long)
+
+
+GET           /ws                    controllers.WsController.socket

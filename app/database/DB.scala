@@ -17,14 +17,14 @@ class DB @Inject()(val db: Database, val actorSystem: ActorSystem) {
 
   def query[A](stmt: DSLContext => A): Future[A] = Future {
     db.withConnection { connection =>
-      val sql = DSL.using(connection, SQLDialect.POSTGRES_9_4)
+      val sql = DSL.using(connection, SQLDialect.POSTGRES)
       stmt(sql)
     }
   }(databaseContext)
 
   def withTransaction[A](stmt: DSLContext => A): Future[A] = Future {
     db.withTransaction { connection =>
-      val sql = DSL.using(connection, SQLDialect.POSTGRES_9_4)
+      val sql = DSL.using(connection, SQLDialect.POSTGRES)
       stmt(sql)
     }
   }(databaseContext)

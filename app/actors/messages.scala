@@ -6,4 +6,6 @@ object messages {
 
   case class RegisterUser(username: String)
 
+  case class BroadcastMsg(msg: String)
+
 }
