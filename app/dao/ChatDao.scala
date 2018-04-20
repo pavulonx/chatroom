@@ -23,7 +23,4 @@ trait ChatDao {
 
   def findPosts(count: Int = 10): Future[SortedSet[Post]]
 
-  //  def deletePost(postId: String)
-
-  //  def updatePost(): String
 }
